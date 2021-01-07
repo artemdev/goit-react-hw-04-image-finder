@@ -1,10 +1,8 @@
 import { Component } from 'react';
 import * as basicLightbox from 'basiclightbox';
 
-//close modal on Esc button
-
 class GalleryItem extends Component {
-  toggleModal = image => {
+  openModal = image => {
     const closeModalWithEscape = e => {
       if (e.key === 'Escape') this.modalInstance.close();
     };
@@ -23,16 +21,16 @@ class GalleryItem extends Component {
       {
         closable: true,
         onShow: () => {
+          //add listeners
           document.addEventListener('keydown', closeModalWithEscape);
-          // close modal by click on Overlay
           setTimeout(() => {
             document
               .querySelector('.Overlay')
               .addEventListener('click', closeModal);
           }, 500);
-          // setTimeconsole.log()
         },
         onClose: () => {
+          //remove listeners
           document.removeEventListener('keydown', closeModalWithEscape);
           document
             .querySelector('.Overlay')
@@ -48,7 +46,7 @@ class GalleryItem extends Component {
 
     return (
       <img
-        onClick={() => this.toggleModal(image)}
+        onClick={() => this.openModal(image)}
         src={image.webformatURL}
         alt=""
         className="ImageGalleryItem-image"
