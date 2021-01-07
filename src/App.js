@@ -1,44 +1,66 @@
 import './App.css';
 import Searchbar from './components/searchbar';
 import ImageGallery from './components/imagegallery';
+import getImages from './api/getImages';
 import { Component } from 'react';
-import axios from 'axios';
+
 import Loader from 'react-loader-spinner';
 
-const images = [];
 class App extends Component {
   state = {
-    query: '',
-    images: images || images.hits,
     isLoading: false,
+    q: '',
+    page: 1,
+    images: [],
   };
 
-  findImage = e => {};
-
-  findImages = e => {
+  loadMore = e => {
     e.preventDefault();
-    const { query } = e.target;
-    this.setState({ query: query.value, isLoading: true });
-    const apiKey = '19741747-aaef32235b2696c68d5824b79';
-    const per_page = 12;
-    const currentPage = 1;
-    return axios
-      .get(
-        `https://pixabay.com/api/?q=${query.value}&page=${currentPage}&key=${apiKey}&image_type=photo&orientation=horizontal&per_page=${per_page}`,
+    const nextPage = this.state.page + 1;
+    const q = this.state.q;
+
+    getImages(q, nextPage)
+      .then(images => {
+        this.setState(prevState => {
+          return {
+            ...prevState,
+            images: [...prevState.images, ...images],
+            page: nextPage,
+            isLoading: false,
+          };
+        });
+      })
+      .then(() =>
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: 'smooth',
+        }),
       )
-      .then(response =>
-        this.setState({ images: response.data.hits, isLoading: false }),
-      )
-      .catch(error => error);
+      .catch(console.log);
+  };
+
+  handleImages = e => {
+    e.preventDefault();
+
+    this.setState(prevState => {
+      return { ...prevState, isLoading: true, q: e.target.q.value };
+    });
+
+    getImages(e.target.q.value || this.state.q).then(images =>
+      this.setState(prevState => {
+        return { ...prevState, images: images, isLoading: false };
+      }),
+    );
   };
 
   render() {
     const imageGalleyProps = {
       images: this.state.images,
+      loadMore: this.loadMore,
     };
     return (
       <div className="App">
-        <Searchbar findImages={this.findImages} />
+        <Searchbar handleImages={this.handleImages} />
 
         {this.state.isLoading ? (
           <Loader
