@@ -9,7 +9,6 @@ import Loader from 'react-loader-spinner';
 class App extends Component {
   state = {
     isLoading: false,
-    q: 'ukraine',
     page: 1,
     images: [],
   };
@@ -43,16 +42,18 @@ class App extends Component {
 
   handleImages = e => {
     e.preventDefault();
-
+    const query = e.target.q.value;
     this.setState(prevState => {
       return { ...prevState, q: e.target.q.value, isLoading: true };
     });
 
-    getImages(this.state.q)
-      .then(images =>
-        this.setState(prevState => {
-          return { ...prevState, images: images };
-        }),
+    getImages(query)
+      .then(
+        images =>
+          !!images.length &&
+          this.setState(prevState => {
+            return { ...prevState, images: images };
+          }),
       )
       .finally(() => {
         this.setState({ isLoading: false });
