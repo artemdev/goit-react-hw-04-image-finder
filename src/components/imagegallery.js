@@ -8,7 +8,7 @@ class ImageGallery extends Component {
 
     return (
       <section>
-        {!!images.length && (
+        {images.length ? (
           <section>
             <ul className="ImageGallery">
               {images.map(image => (
@@ -25,6 +25,8 @@ class ImageGallery extends Component {
               Load more
             </button>
           </section>
+        ) : (
+          <h3>Please, enter the name of the image to find</h3>
         )}
       </section>
     );
