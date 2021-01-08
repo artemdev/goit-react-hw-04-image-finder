@@ -16,6 +16,8 @@ class App extends Component {
 
   loadMore = e => {
     e.preventDefault();
+    this.setState({ isLoading: true });
+
     const nextPage = this.state.page + 1;
     const q = this.state.q;
 
