@@ -1,36 +1,74 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 import GalleryItem from './galleryItem';
+import Loader from 'react-loader-spinner';
 import shortid from 'shortid';
+import getImages from '../api/getImages';
 
-class ImageGallery extends Component {
-  render() {
-    const { images } = this.props;
+export default function ImageGallery({ query }) {
+  const [images, setImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(1);
 
-    return (
-      <section>
-        {images.length ? (
-          <section>
-            <ul className="ImageGallery">
-              {images.map(image => (
-                <li key={shortid.generate()} className="ImageGalleryItem">
-                  <GalleryItem image={image} />
-                </li>
-              ))}
-            </ul>
-            <button
-              className="Button"
-              type="submit"
-              onClick={this.props.loadMore}
-            >
-              Load more
-            </button>
-          </section>
-        ) : (
-          <h3>Please, enter the name of the image to find</h3>
-        )}
-      </section>
-    );
-  }
+  useEffect(() => {
+    if (query) {
+      setIsLoading(true);
+      getImages(query)
+        .then(images => !!images.length && setImages(images))
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [query]);
+
+  useEffect(() => {
+    if (query) {
+      setIsLoading(true);
+      getImages(query, page)
+        .then(newImages => {
+          setImages([...images, ...newImages]);
+          setIsLoading(false);
+        })
+        .then(() =>
+          window.scrollTo({
+            top: document.documentElement.scrollHeight,
+            behavior: 'smooth',
+          }),
+        )
+        .catch(console.log);
+    }
+  }, [page]);
+
+  const loadMore = e => {
+    e.preventDefault();
+    setPage(prevPage => prevPage + 1);
+  };
+
+  return (
+    <section>
+      {isLoading ? (
+        <Loader
+          type="Puff"
+          color="#00BFFF"
+          height={100}
+          width={100}
+          timeout={3000}
+        />
+      ) : images.length ? (
+        <section>
+          <ul className="ImageGallery">
+            {images.map(image => (
+              <li key={shortid.generate()} className="ImageGalleryItem">
+                <GalleryItem image={image} />
+              </li>
+            ))}
+          </ul>
+          <button className="Button" type="submit" onClick={loadMore}>
+            Load more
+          </button>
+        </section>
+      ) : (
+        <h3>Please, enter the name of the image to find</h3>
+      )}
+    </section>
+  );
 }
-
-export default ImageGallery;
