@@ -20,27 +20,22 @@ export default function ImageGallery({ query }) {
     }
   }, [query]);
 
-  useEffect(() => {
-    if (query) {
-      setIsLoading(true);
-      getImages(query, page)
-        .then(newImages => {
-          setImages([...images, ...newImages]);
-          setIsLoading(false);
-        })
-        .then(() =>
-          window.scrollTo({
-            top: document.documentElement.scrollHeight,
-            behavior: 'smooth',
-          }),
-        )
-        .catch(console.log);
-    }
-  }, [page]);
-
   const loadMore = e => {
     e.preventDefault();
     setPage(prevPage => prevPage + 1);
+    setIsLoading(true);
+    getImages(query, page + 1)
+      .then(newImages => {
+        setImages([...images, ...newImages]);
+        setIsLoading(false);
+      })
+      .then(() =>
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: 'smooth',
+        }),
+      )
+      .catch(console.log);
   };
 
   return (
