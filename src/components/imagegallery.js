@@ -10,32 +10,30 @@ export default function ImageGallery({ query }) {
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    if (query) {
-      setIsLoading(true);
-      getImages(query)
-        .then(images => !!images.length && setImages(images))
-        .finally(() => {
-          setIsLoading(false);
-        });
-    }
+    setImages([]);
   }, [query]);
+
+  useEffect(() => {
+    if (!query) return;
+    setIsLoading(true);
+    getImages(query, page)
+      .then(newImages => {
+        setImages(prevImages => [...prevImages, ...newImages]);
+        setIsLoading(false);
+      })
+      .then(() => {
+        if (page === 1) return;
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: 'smooth',
+        });
+      })
+      .catch(console.log);
+  }, [page, query]);
 
   const loadMore = e => {
     e.preventDefault();
     setPage(prevPage => prevPage + 1);
-    setIsLoading(true);
-    getImages(query, page + 1)
-      .then(newImages => {
-        setImages([...images, ...newImages]);
-        setIsLoading(false);
-      })
-      .then(() =>
-        window.scrollTo({
-          top: document.documentElement.scrollHeight,
-          behavior: 'smooth',
-        }),
-      )
-      .catch(console.log);
   };
 
   return (
