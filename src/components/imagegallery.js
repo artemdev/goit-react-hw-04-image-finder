@@ -5,9 +5,9 @@ import shortid from 'shortid';
 import getImages from '../api/getImages';
 
 export default function ImageGallery({ query }) {
-  const [images, setImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
+  const [images, setImages] = useState([]);
 
   useEffect(() => {
     setImages([]);

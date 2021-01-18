@@ -9,6 +9,7 @@ axios.defaults.params = {
   orientation: 'horizontal',
   per_page: 12,
 };
+
 const getImages = async (q, page = 1) => {
   try {
     const { data } = await axios.get('/', { params: { q, page } });
